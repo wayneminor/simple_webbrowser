@@ -1,4 +1,4 @@
-import socket
+import socket, ssl
 
 from typing import TextIO
 
@@ -9,13 +9,18 @@ class URL:
         #       url := protocal://host-name/path
         #           |:= protocal://host-name
         self.scheme, url = url.split('://', 1)
-        assert self.scheme == 'http'
+        assert self.scheme in ['http', 'https']
 
         if '/' not in url:
             url += '/'
         
         self.host, url = url.split('/', 1)
-        self.path = '/'
+        self.path = '/' + url
+
+        if self.scheme == 'http':
+            self.port = 80
+        elif self.scheme == 'https':
+            self.port = 443
 
     # 建立连接, 简要分析response, 获得response header内容, 返回response entity-body内容
     #   #   http1.0 response的syntax 详见:https://www.w3.org/Protocols/HTTP/1.0/spec.html#Response
@@ -26,7 +31,13 @@ class URL:
             proto=socket.IPPROTO_TCP
         )
 
-        sock.connect((self.host, 80))
+        if self.scheme == 'http':
+            pass
+        elif self.scheme == 'https':
+            ctx = ssl.create_default_context()
+            sock = ctx.wrap_socket(sock, server_hostname=self.host)
+
+        sock.connect((self.host, self.port))
 
         request = f"GET {self.path} HTTP/1.0 \r\n"
         request += f"Host: {self.host}\r\n"
@@ -78,4 +89,4 @@ if __name__ == "__main__":
     load(URL(sys.argv[1]))
 
     # for test
-    # load(URL('http://example.org/'))
+    # load(URL('https://browser.engineering/examples/xiyouji.html'))
