@@ -1,0 +1,3 @@
+# 忽略python binary code
+__pycache__/
+*.pyc
