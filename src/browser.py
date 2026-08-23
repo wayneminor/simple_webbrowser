@@ -8,7 +8,7 @@ HEIGHT = 600
 HSTEP = 13
 VSTEP = 18
 
-SCROLL_STEP = 0
+SCROLL_STEP = 18
 
 class Browser:
     def __init__(self) -> None:
@@ -19,6 +19,9 @@ class Browser:
             height=HEIGHT
         )
         self.canvas.pack()
+
+        self.scroll = 0
+        self.window.bind('<Down>', self.scrolldown) # type: ignore
 
     # 第一次load url时, 展示相应的html内容
     def load(self, url: URL) -> None:
@@ -36,14 +39,21 @@ class Browser:
         self.canvas.delete('all')
         # 绘制text
         for c, (cursor_x, cursor_y) in self.layout:
+            # 不绘制screen中看不见的部分.
+            if cursor_y-self.scroll > HEIGHT:
+                break
+
             self.canvas.create_text(
-                cursor_x, cursor_y, text=c,
+                cursor_x, 
+                cursor_y-self.scroll, 
+                text=c,
                 anchor="nw")
         
 
     # browser 窗口 sroclldown事件 的 callback.
     def scrolldown(self, e): # type: ignore
-        pass
+        self.scroll += SCROLL_STEP
+        self.draw()
 
 # 获得http1.0 response中 entity-body部分(html版) 的文本内容, 只是简单地去除了tag.
 #   http1.0 response的syntax 详见:https://www.w3.org/Protocols/HTTP/1.0/spec.html#Response
