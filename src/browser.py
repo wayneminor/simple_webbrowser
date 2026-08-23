@@ -36,7 +36,9 @@ class Browser:
         self.canvas.delete('all')
         # 绘制text
         for c, (cursor_x, cursor_y) in self.layout:
-            self.canvas.create_text(cursor_x, cursor_y, text=c)
+            self.canvas.create_text(
+                cursor_x, cursor_y, text=c,
+                anchor="nw")
         
 
     # browser 窗口 sroclldown事件 的 callback.
