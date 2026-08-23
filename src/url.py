@@ -17,6 +17,8 @@ class URL:
         self.host, url = url.split('/', 1)
         self.path = '/'
 
+    # 建立连接, 简要分析response, 获得response header内容, 返回response entity-body内容
+    #   #   http1.0 response的syntax 详见:https://www.w3.org/Protocols/HTTP/1.0/spec.html#Response
     def request(self) -> str:
         sock = socket.socket(
             family = socket.AF_INET,
